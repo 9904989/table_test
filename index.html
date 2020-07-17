@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://s3.amazonaws.com/stitch-sdks/js/bundles/4.6.0/stitch.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
     <title>HTML5 Table Test</title>
 
+    <link rel="stylesheet" href="blog.css">
     <style>
         .content-table {
             border-collapse: collapse;
@@ -18,7 +21,8 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
         }
         .content-table thead tr {
-            background-color: #009879;
+            /*background-color: #009879;*/
+            background-color: black;
             color: #ffffff;
             font-weight: bold;
         }
@@ -43,8 +47,13 @@
     </style>
 
 </head>
-<body>
-    <h1>Data Trends</h1>
+<body onload="get_data();">
+        <!-- EVIE'S CHEEKY FACE -->
+        <div class="header">
+            <img class="logo" src="evie.jpg">
+            <h1>Data Trends</h1>
+        </div>
+
     <table class="content-table">
         <thead>
             <tr>
@@ -75,14 +84,14 @@
                 <th>23:00</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="table-body">
             <tr>
                 <td>Mon 20 Jun</td>
                 <td> </td>
                 <td><img src="nappy_dirty.png"></td>
                 <td> </td>
                 <td> </td>
-                <td><img src="bottle.png"></td>
+                <td><img src="bottle.png"><img src="nappy_dirty.png"></td>
                 <td> </td>
                 <td> </td>
                 <td> </td>
@@ -186,5 +195,80 @@
             </tr>
         </tbody>
     </table>
+
+    <script>
+        const client = stitch.Stitch.initializeDefaultAppClient('evie_tracker-qprfn');
+        const db = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas').db('log_entries');
+        client.auth.loginWithCredential(new stitch.AnonymousCredential()).catch(console.error);
+
+        function get_data() {
+        const dates = [];
+        const data_set = [];
+        const setup_log_entries = [];
+        const log_entries = [];
+        
+        var i;
+        var j;
+        var k;
+
+        for(i=0; i < 24; i++) {
+            log_entries[i] = "";
+        }
+
+        db.collection('evie_log')
+        .find({}, {limit: 100, sort: {"blog_date": -1, "time": -1}})
+		.toArray()
+        .then(docs => {
+        i = 0;
+        docs.map(doc => {
+        if(doc.icon!='message.png') {            
+			if(!dates[0]) {
+                dates.push(doc.blog_date);
+                // [...log_entries] clones the array rather than passing a reference
+                data_set.push([...log_entries]);
+                (doc.icon=='bottle') ?
+                    data_set[i][parseFloat(doc.time.slice(0,2))] += `<img src=${doc.icon}.png>`
+                :
+                    data_set[i][parseFloat(doc.time.slice(0,2))] += `<img src=${doc.icon}>`;
+			} else if(dates[i]!=doc.blog_date) {
+                dates.push(doc.blog_date);
+                data_set.push([...log_entries]);
+                i++;
+                (doc.icon=='bottle') ?
+                    data_set[i][parseFloat(doc.time.slice(0,2))] += `<img src=${doc.icon}.png>`
+                :
+                    data_set[i][parseFloat(doc.time.slice(0,2))] += `<img src=${doc.icon}>`;
+			} else {
+                (doc.icon=='bottle') ?
+                    data_set[i][parseFloat(doc.time.slice(0,2))] += `<img src=${doc.icon}.png>`
+                :
+                    data_set[i][parseFloat(doc.time.slice(0,2))] += `<img src=${doc.icon}>`;
+            }
+        }
+        });
+        var html = "";
+        var table_row;
+        var table_data = document.getElementById("table-body");       
+        //when we're ready, change the innerHTML on the table-body tag directly
+        j = 0;
+        dates.forEach(date => {
+            table_row = document.createElement('tr');
+            //html = '<tr>'
+            html = `<td>${date}</td>`;
+            //for(j = 0; j < data_set.length; j++) {
+                for(k = 0; k < data_set[j].length; k++) {
+                    html += `<td>${data_set[j][k]}</td>`;
+                }
+            j++;
+                //}
+            //html = '</tr>'
+            //table_data.innerHTML = html;
+            table_row.innerHTML = html;
+            table_data.appendChild(table_row);
+        });
+		}).catch(err => {
+		});
+    }
+    </script>
 </body>
 </html>
