@@ -58,34 +58,34 @@
         <thead>
             <tr>
                 <th>date</th>
-                <th>00:00</th>
-                <th>01:00</th>
-                <th>02:00</th>
-                <th>03:00</th>
-                <th>04:00</th>
-                <th>05:00</th>
-                <th>06:00</th>
-                <th>07:00</th>
-                <th>08:00</th>
-                <th>09:00</th>
-                <th>10:00</th>
-                <th>11:00</th>
-                <th>12:00</th>
-                <th>13:00</th>
-                <th>14:00</th>
-                <th>15:00</th>
-                <th>16:00</th>
-                <th>17:00</th>
-                <th>18:00</th>
-                <th>19:00</th>
-                <th>20:00</th>
-                <th>21:00</th>
-                <th>22:00</th>
-                <th>23:00</th>
+                <th>midnight-1am</th>
+                <th>1-2am</th>
+                <th>2-3am</th>
+                <th>3-4am</th>
+                <th>4-5am</th>
+                <th>5-6am</th>
+                <th>6-7am</th>
+                <th>7-8am</th>
+                <th>8-9am</th>
+                <th>9-10am</th>
+                <th>10-11am</th>
+                <th>11-12pm</th>
+                <th>12-1pm</th>
+                <th>1-2pm</th>
+                <th>2-3pm</th>
+                <th>3-4pm</th>
+                <th>4-5pm</th>
+                <th>5-6pm</th>
+                <th>6-7pm</th>
+                <th>7-8pm</th>
+                <th>8-9pm</th>
+                <th>9-10pm</th>
+                <th>10-11pm</th>
+                <th>11-midnight</th>
             </tr>
         </thead>
         <tbody id="table-body">
-            <tr>
+            <!--<tr>
                 <td>Mon 20 Jun</td>
                 <td> </td>
                 <td><img src="nappy_dirty.png"></td>
@@ -192,7 +192,7 @@
                 <td> </td>
                 <td> </td>
                 <td> </td>
-            </tr>
+            </tr>-->
         </tbody>
     </table>
 
@@ -216,7 +216,7 @@
         }
 
         db.collection('evie_log')
-        .find({}, {limit: 100, sort: {"blog_date": -1, "time": -1}})
+        .find({}, {limit: 500, sort: {"blog_date": -1, "time": -1}})
 		.toArray()
         .then(docs => {
         i = 0;
@@ -254,7 +254,7 @@
         dates.forEach(date => {
             table_row = document.createElement('tr');
             //html = '<tr>'
-            html = `<td>${date}</td>`;
+            html = `<td>${format_date(date)}</td>`;
             //for(j = 0; j < data_set.length; j++) {
                 for(k = 0; k < data_set[j].length; k++) {
                     html += `<td>${data_set[j][k]}</td>`;
@@ -266,8 +266,17 @@
             table_row.innerHTML = html;
             table_data.appendChild(table_row);
         });
+        //alert(format_date(dates[0]));
 		}).catch(err => {
 		});
+    }
+
+    function format_date(date) {
+        days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        d = new Date(date);
+        return days[d.getDay()] + " " + d.getDate() + " " + months[d.getMonth()];
     }
     </script>
 </body>
