@@ -46,8 +46,14 @@
             height: auto;
         }
         th {
-            position: sticky;
             position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            background-color: black;
+        }
+        th.sticky {
+            position: -webkit-sticky; /* Safari */
+            position: sticky;
             top: 0;
             background-color: black;
         }
@@ -64,7 +70,7 @@
     <table class="content-table">
         <thead>
             <tr>
-                <th>date</th>
+                <th class="sticky">date</th>
                 <th>midnight-1am</th>
                 <th>1-2am</th>
                 <th>2-3am</th>
